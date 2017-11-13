@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"strconv"
 
-	"github.com/Nhanderu/tuyo/text"
+	"github.com/Nhanderu/tuyo/stringutil"
 )
 
 type Grid struct {
@@ -91,7 +91,7 @@ func (g Grid) WriteTo(w io.Writer) (int64, error) {
 			if v := g.v[i][j]; v == 0 {
 				n, err = w.Write([]byte("     -"))
 			} else {
-				n, err = w.Write([]byte(text.PadLeft(strconv.FormatUint(uint64(g.v[i][j]), 10), " ", 6)))
+				n, err = w.Write([]byte(stringutil.PadLeft(strconv.FormatUint(uint64(g.v[i][j]), 10), " ", 6)))
 			}
 			if total += int64(n); err != nil {
 				return total, err
