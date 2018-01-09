@@ -1,18 +1,5 @@
-# Binaries for programs and plugins
-*.exe
-*.dll
-*.so
 debug
-
-# Test binary
-*.test
-
-# Output of the go coverage tool
-*.out
-
-# Vendor folders
-.glide/
-vendor/
-
-# Project folders
+/target/
+**/*.rs.bk
+Cargo.lock
 .vscode/

@@ -1,0 +1,13 @@
+[package]
+name = "dois-mil"
+description = "2048 game in the terminal!"
+version = "0.0.1"
+authors = ["Rafael Escobar <rescobar@protonmail.com>"]
+keywords = [
+    "2048",
+    "tty",
+    "game",
+]
+
+[dependencies]
+termion = "1.5.1"
