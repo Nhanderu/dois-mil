@@ -71,9 +71,9 @@ impl Game {
                 for line in &self.lines {
                     write!(w, "{}", cursor::Goto(left_pad, top_pad + line_count))?;
                     for value in line {
-                        write!(w, "{:>6}", value);
+                        write!(w, "{:>6}", value)?;
                     }
-                    writeln!(w, "");
+                    writeln!(w, "")?;
                     line_count += 1;
                 }
 
