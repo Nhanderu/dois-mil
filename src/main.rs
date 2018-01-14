@@ -1,3 +1,4 @@
+use std::env::args;
 use std::io::{self, stdin, stdout, Write};
 
 extern crate termion;
@@ -10,11 +11,17 @@ use termion::raw::IntoRawMode;
 use termion::input::TermRead;
 use termion::event::Key;
 
+const DEFAULT_GRID_SIZE: u16 = 3;
+
 fn main() {
     let stdout = stdout().into_raw_mode().unwrap();
     let mut screen = termion::screen::AlternateScreen::from(stdout);
 
-    let game = Game::new(3);
+    let grid_size = args().nth(1).map_or(DEFAULT_GRID_SIZE, |raw| {
+        raw.parse::<u16>().unwrap_or(DEFAULT_GRID_SIZE)
+    });
+
+    let game = Game::new(grid_size);
     game.write_to(&mut screen).unwrap();
 
     let stdin = stdin();
