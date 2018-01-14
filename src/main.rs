@@ -60,8 +60,7 @@ impl Game {
                     "{red}INVALIDSIZE{reset}",
                     red = color::Fg(color::Red),
                     reset = style::Reset,
-                )?;
-                Ok(())
+                )
             }
 
             Some((left_pad, top_pad)) => {
