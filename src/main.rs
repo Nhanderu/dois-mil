@@ -96,19 +96,18 @@ impl Game {
 
                 let next_j = cur_j;
                 for next_i in (0..i).rev() {
-                    let next_cell = *match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
-                        Some(x) => x,
-                        None => break,
+                    match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
+                        Some(0) => {
+                            self.grid[cur_i][cur_j] = 0;
+                            self.grid[next_i][next_j] = cur_cell;
+                        },
+                        Some(next_cell) if *next_cell == cur_cell => {
+                            self.grid[cur_i][cur_j] = 0;
+                            self.grid[next_i][next_j] *= 2;
+                            break;
+                        },
+                        _ => break,
                     };
-                    if next_cell == 0 {
-                        self.grid[cur_i][cur_j] = 0;
-                        self.grid[next_i][next_j] = cur_cell;
-                    } else if next_cell == cur_cell {
-                        self.grid[cur_i][cur_j] = 0;
-                        self.grid[next_i][next_j] *= 2;
-                    } else {
-                        break
-                    }
                 }
             }
         }
@@ -126,19 +125,18 @@ impl Game {
 
                 let next_j = cur_j;
                 for next_i in i+1..self.size {
-                    let next_cell = *match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
-                        Some(x) => x,
-                        None => break,
+                    match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
+                        Some(0) => {
+                            self.grid[cur_i][cur_j] = 0;
+                            self.grid[next_i][next_j] = cur_cell;
+                        },
+                        Some(next_cell) if *next_cell == cur_cell => {
+                            self.grid[cur_i][cur_j] = 0;
+                            self.grid[next_i][next_j] *= 2;
+                            break;
+                        },
+                        _ => break,
                     };
-                    if next_cell == 0 {
-                        self.grid[cur_i][cur_j] = 0;
-                        self.grid[next_i][next_j] = cur_cell;
-                    } else if next_cell == cur_cell {
-                        self.grid[cur_i][cur_j] = 0;
-                        self.grid[next_i][next_j] *= 2;
-                    } else {
-                        break
-                    }
                 }
             }
         }
@@ -156,19 +154,18 @@ impl Game {
 
                 let next_i = cur_i;
                 for next_j in (0..j).rev() {
-                    let next_cell = *match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
-                        Some(x) => x,
-                        None => break,
+                    match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
+                        Some(0) => {
+                            self.grid[cur_i][cur_j] = 0;
+                            self.grid[next_i][next_j] = cur_cell;
+                        },
+                        Some(next_cell) if *next_cell == cur_cell => {
+                            self.grid[cur_i][cur_j] = 0;
+                            self.grid[next_i][next_j] *= 2;
+                            break;
+                        },
+                        _ => break,
                     };
-                    if next_cell == 0 {
-                        self.grid[cur_i][cur_j] = 0;
-                        self.grid[next_i][next_j] = cur_cell;
-                    } else if next_cell == cur_cell {
-                        self.grid[cur_i][cur_j] = 0;
-                        self.grid[next_i][next_j] *= 2;
-                    } else {
-                        break
-                    }
                 }
             }
         }
@@ -186,19 +183,18 @@ impl Game {
 
                 let next_i = cur_i;
                 for next_j in j+1..self.size {
-                    let next_cell = *match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
-                        Some(x) => x,
-                        None => break,
+                    match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
+                        Some(0) => {
+                            self.grid[cur_i][cur_j] = 0;
+                            self.grid[next_i][next_j] = cur_cell;
+                        },
+                        Some(next_cell) if *next_cell == cur_cell => {
+                            self.grid[cur_i][cur_j] = 0;
+                            self.grid[next_i][next_j] *= 2;
+                            break;
+                        },
+                        _ => break,
                     };
-                    if next_cell == 0 {
-                        self.grid[cur_i][cur_j] = 0;
-                        self.grid[next_i][next_j] = cur_cell;
-                    } else if next_cell == cur_cell {
-                        self.grid[cur_i][cur_j] = 0;
-                        self.grid[next_i][next_j] *= 2;
-                    } else {
-                        break
-                    }
                 }
             }
         }
