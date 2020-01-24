@@ -88,7 +88,7 @@ impl Game {
         for i in 0..self.size {
             for j in 0..self.size {
 
-                let (cur_i, cur_j) = (i, j);
+                let (mut cur_i, mut cur_j) = (i, j);
                 let cur_cell = self.grid[cur_i][cur_j];
                 if cur_cell == 0 {
                     continue
@@ -100,6 +100,8 @@ impl Game {
                         Some(0) => {
                             self.grid[cur_i][cur_j] = 0;
                             self.grid[next_i][next_j] = cur_cell;
+                            cur_i = next_i;
+                            cur_j = next_j;
                         },
                         Some(next_cell) if *next_cell == cur_cell => {
                             self.grid[cur_i][cur_j] = 0;
@@ -117,7 +119,7 @@ impl Game {
         for i in (0..self.size).rev() {
             for j in 0..self.size {
 
-                let (cur_i, cur_j) = (i, j);
+                let (mut cur_i, mut cur_j) = (i, j);
                 let cur_cell = self.grid[cur_i][cur_j];
                 if cur_cell == 0 {
                     continue
@@ -129,6 +131,8 @@ impl Game {
                         Some(0) => {
                             self.grid[cur_i][cur_j] = 0;
                             self.grid[next_i][next_j] = cur_cell;
+                            cur_i = next_i;
+                            cur_j = next_j;
                         },
                         Some(next_cell) if *next_cell == cur_cell => {
                             self.grid[cur_i][cur_j] = 0;
@@ -146,7 +150,7 @@ impl Game {
         for i in 0..self.size {
             for j in 0..self.size {
 
-                let (cur_i, cur_j) = (i, j);
+                let (mut cur_i, mut cur_j) = (i, j);
                 let cur_cell = self.grid[cur_i][cur_j];
                 if cur_cell == 0 {
                     continue
@@ -158,6 +162,8 @@ impl Game {
                         Some(0) => {
                             self.grid[cur_i][cur_j] = 0;
                             self.grid[next_i][next_j] = cur_cell;
+                            cur_i = next_i;
+                            cur_j = next_j;
                         },
                         Some(next_cell) if *next_cell == cur_cell => {
                             self.grid[cur_i][cur_j] = 0;
@@ -175,7 +181,7 @@ impl Game {
         for i in 0..self.size {
             for j in (0..self.size).rev() {
 
-                let (cur_i, cur_j) = (i, j);
+                let (mut cur_i, mut cur_j) = (i, j);
                 let cur_cell = self.grid[cur_i][cur_j];
                 if cur_cell == 0 {
                     continue
@@ -187,6 +193,8 @@ impl Game {
                         Some(0) => {
                             self.grid[cur_i][cur_j] = 0;
                             self.grid[next_i][next_j] = cur_cell;
+                            cur_i = next_i;
+                            cur_j = next_j;
                         },
                         Some(next_cell) if *next_cell == cur_cell => {
                             self.grid[cur_i][cur_j] = 0;
