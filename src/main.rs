@@ -115,7 +115,7 @@ impl Game {
     }
 
     fn move_down(&mut self) {
-        for i in 0..self.size {
+        for i in (0..self.size).rev() {
             for j in 0..self.size {
 
                 let (cur_i, cur_j) = (i, j);
@@ -176,7 +176,7 @@ impl Game {
 
     fn move_right(&mut self) {
         for i in 0..self.size {
-            for j in 0..self.size {
+            for j in (0..self.size).rev() {
 
                 let (cur_i, cur_j) = (i, j);
                 let cur_cell = self.grid[cur_i][cur_j];
