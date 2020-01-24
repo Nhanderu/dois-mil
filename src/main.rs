@@ -117,135 +117,123 @@ impl Game {
         }
     }
 
-    fn move_up(&self) -> Game {
-        let mut new_grid = vec![vec![0; self.size as usize]; self.size as usize];
+    fn move_up(&mut self) {
+        for i in 0..self.size as usize {
+            for j in 0..self.size as usize {
 
-        for (i, line) in self.grid.iter().rev().enumerate() {
-            for (j, cell) in line.iter().enumerate() {
                 let (cur_i, cur_j) = (i, j);
-                let (next_i, next_j) = (i + 1, j);
-
-                let mut cur_cell = *cell;
-                let mut next_cell = *match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
-                    Some(x) => x,
-                    None => break,
-                };
-
-                if cur_cell == next_cell || next_cell == 0 {
-                    next_cell += cur_cell;
-                    cur_cell = 0;
+                let cur_cell = self.grid[cur_i][cur_j];
+                if cur_cell == 0 {
+                    continue
                 }
 
-                let size = self.size as usize - 1;
-                let (cur_i, cur_j) = (size - cur_i, cur_j);
-                let (next_i, next_j) = (size - next_i, next_j);
-
-                new_grid[cur_i][cur_j] = cur_cell;
-                new_grid[next_i][next_j] = next_cell;
+                let next_j = cur_j;
+                for next_i in (0..i).rev() {
+                    let next_cell = *match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
+                        Some(x) => x,
+                        None => break,
+                    };
+                    if next_cell == 0 {
+                        self.grid[cur_i][cur_j] = 0;
+                        self.grid[next_i][next_j] = cur_cell;
+                    } else if next_cell == cur_cell {
+                        self.grid[cur_i][cur_j] = 0;
+                        self.grid[next_i][next_j] *= 2;
+                    } else {
+                        break
+                    }
+                }
             }
-        }
-
-        Self {
-            grid: new_grid,
-            size: self.size,
-            score: 0,
         }
     }
 
-    fn move_right(&self) -> Game {
-        let mut new_grid = vec![vec![0; self.size as usize]; self.size as usize];
+    fn move_down(&mut self) {
+        for i in 0..self.size as usize {
+            for j in 0..self.size as usize {
 
-        for (i, line) in self.grid.iter().enumerate() {
-            for (j, cell) in line.iter().enumerate() {
                 let (cur_i, cur_j) = (i, j);
-                let (next_i, next_j) = (i, j + 1);
-
-                let mut cur_cell = *cell;
-                let mut next_cell = *match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
-                    Some(x) => x,
-                    None => break,
-                };
-
-                if cur_cell == next_cell || next_cell == 0 {
-                    next_cell += cur_cell;
-                    cur_cell = 0;
+                let cur_cell = self.grid[cur_i][cur_j];
+                if cur_cell == 0 {
+                    continue
                 }
 
-                new_grid[cur_i][cur_j] = cur_cell;
-                new_grid[next_i][next_j] = next_cell;
+                let next_j = cur_j;
+                for next_i in i+1..self.size as usize {
+                    let next_cell = *match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
+                        Some(x) => x,
+                        None => break,
+                    };
+                    if next_cell == 0 {
+                        self.grid[cur_i][cur_j] = 0;
+                        self.grid[next_i][next_j] = cur_cell;
+                    } else if next_cell == cur_cell {
+                        self.grid[cur_i][cur_j] = 0;
+                        self.grid[next_i][next_j] *= 2;
+                    } else {
+                        break
+                    }
+                }
             }
-        }
-
-        Self {
-            grid: new_grid,
-            size: self.size,
-            score: 0,
         }
     }
 
-    fn move_down(&self) -> Game {
-        let mut new_grid = vec![vec![0; self.size as usize]; self.size as usize];
+    fn move_left(&mut self) {
+        for i in 0..self.size as usize {
+            for j in 0..self.size as usize {
 
-        for (i, line) in self.grid.iter().enumerate() {
-            for (j, cell) in line.iter().enumerate() {
                 let (cur_i, cur_j) = (i, j);
-                let (next_i, next_j) = (i + 1, j);
-
-                let mut cur_cell = *cell;
-                let mut next_cell = *match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
-                    Some(x) => x,
-                    None => break,
-                };
-
-                if cur_cell == next_cell || next_cell == 0 {
-                    next_cell += cur_cell;
-                    cur_cell = 0;
+                let cur_cell = self.grid[cur_i][cur_j];
+                if cur_cell == 0 {
+                    continue
                 }
 
-                new_grid[cur_i][cur_j] = cur_cell;
-                new_grid[next_i][next_j] = next_cell;
+                let next_i = cur_i;
+                for next_j in (0..j).rev() {
+                    let next_cell = *match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
+                        Some(x) => x,
+                        None => break,
+                    };
+                    if next_cell == 0 {
+                        self.grid[cur_i][cur_j] = 0;
+                        self.grid[next_i][next_j] = cur_cell;
+                    } else if next_cell == cur_cell {
+                        self.grid[cur_i][cur_j] = 0;
+                        self.grid[next_i][next_j] *= 2;
+                    } else {
+                        break
+                    }
+                }
             }
-        }
-
-        Self {
-            grid: new_grid,
-            size: self.size,
-            score: 0,
         }
     }
 
-    fn move_left(&self) -> Game {
-        let mut new_grid = vec![vec![0; self.size as usize]; self.size as usize];
+    fn move_right(&mut self) {
+        for i in 0..self.size as usize {
+            for j in 0..self.size as usize {
 
-        for (i, line) in self.grid.iter().enumerate() {
-            for (j, cell) in line.iter().rev().enumerate() {
                 let (cur_i, cur_j) = (i, j);
-                let (next_i, next_j) = (i, j + 1);
-
-                let mut cur_cell = *cell;
-                let mut next_cell = *match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
-                    Some(x) => x,
-                    None => break,
-                };
-
-                if cur_cell == next_cell || next_cell == 0 {
-                    next_cell += cur_cell;
-                    cur_cell = 0;
+                let cur_cell = self.grid[cur_i][cur_j];
+                if cur_cell == 0 {
+                    continue
                 }
 
-                let size = self.size as usize - 1;
-                let (cur_i, cur_j) = (cur_i, size - cur_j);
-                let (next_i, next_j) = (next_i, size - next_j);
-
-                new_grid[cur_i][cur_j] = cur_cell;
-                new_grid[next_i][next_j] = next_cell;
+                let next_i = cur_i;
+                for next_j in j+1..self.size as usize {
+                    let next_cell = *match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
+                        Some(x) => x,
+                        None => break,
+                    };
+                    if next_cell == 0 {
+                        self.grid[cur_i][cur_j] = 0;
+                        self.grid[next_i][next_j] = cur_cell;
+                    } else if next_cell == cur_cell {
+                        self.grid[cur_i][cur_j] = 0;
+                        self.grid[next_i][next_j] *= 2;
+                    } else {
+                        break
+                    }
+                }
             }
-        }
-
-        Self {
-            grid: new_grid,
-            size: self.size,
-            score: 0,
         }
     }
 
