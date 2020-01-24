@@ -12,6 +12,9 @@ use termion::raw::IntoRawMode;
 use termion::input::TermRead;
 use termion::event::Key;
 
+extern crate rand;
+use rand::distributions::{Distribution, Uniform};
+
 const DEFAULT_GRID_SIZE: usize = 3;
 
 fn main() {
@@ -29,10 +32,22 @@ fn main() {
     for key in stdin.keys() {
         match key.unwrap() {
             Key::Ctrl('c') | Key::Ctrl('q') => break,
-            Key::Up => game.move_up(),
-            Key::Right => game.move_right(),
-            Key::Down => game.move_down(),
-            Key::Left => game.move_left(),
+            Key::Up => {
+                game.move_up();
+                game.fill_random_cell();
+            },
+            Key::Right => {
+                game.move_right();
+                game.fill_random_cell();
+            },
+            Key::Down => {
+                game.move_down();
+                game.fill_random_cell();
+            },
+            Key::Left => {
+                game.move_left();
+                game.fill_random_cell();
+            },
             _ => {}
         }
         game.write_to(&mut screen).unwrap();
@@ -44,15 +59,20 @@ struct Game {
     grid: Vec<Vec<u8>>,
     size: usize,
     score: u32,
+    random_pos: Uniform<usize>,
 }
 
 impl Game {
     fn new(size: usize) -> Game {
-        Game {
-            grid: vec![vec![1; size]; size],
+        let mut game = Game {
+            grid: vec![vec![0; size]; size],
             size: size,
             score: 0,
-        }
+            random_pos: Uniform::from(0..size),
+        };
+        game.fill_random_cell();
+        game.fill_random_cell();
+        return game
     }
 
     fn write_to(&self, w: &mut Write) -> io::Result<()> {
@@ -80,6 +100,19 @@ impl Game {
                 }
 
                 w.flush()
+            }
+        }
+    }
+
+    fn fill_random_cell(&mut self) {
+        let mut rng = rand::thread_rng();
+        loop {
+            let i = self.random_pos.sample(&mut rng);
+            let j = self.random_pos.sample(&mut rng);
+
+            if self.grid[i][j] == 0 {
+                self.grid[i][j] = 2;
+                break;
             }
         }
     }
