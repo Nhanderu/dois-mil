@@ -104,8 +104,10 @@ impl Game {
                             cur_j = next_j;
                         },
                         Some(next_cell) if *next_cell == cur_cell => {
+                            let points = cur_cell * 2;
                             self.grid[cur_i][cur_j] = 0;
-                            self.grid[next_i][next_j] *= 2;
+                            self.grid[next_i][next_j] = points;
+                            self.score += points as u32;
                             break;
                         },
                         _ => break,
@@ -135,8 +137,10 @@ impl Game {
                             cur_j = next_j;
                         },
                         Some(next_cell) if *next_cell == cur_cell => {
+                            let points = cur_cell * 2;
                             self.grid[cur_i][cur_j] = 0;
-                            self.grid[next_i][next_j] *= 2;
+                            self.grid[next_i][next_j] = points;
+                            self.score += points as u32;
                             break;
                         },
                         _ => break,
@@ -166,8 +170,10 @@ impl Game {
                             cur_j = next_j;
                         },
                         Some(next_cell) if *next_cell == cur_cell => {
+                            let points = cur_cell * 2;
                             self.grid[cur_i][cur_j] = 0;
-                            self.grid[next_i][next_j] *= 2;
+                            self.grid[next_i][next_j] = points;
+                            self.score += points as u32;
                             break;
                         },
                         _ => break,
@@ -197,8 +203,10 @@ impl Game {
                             cur_j = next_j;
                         },
                         Some(next_cell) if *next_cell == cur_cell => {
+                            let points = cur_cell * 2;
                             self.grid[cur_i][cur_j] = 0;
-                            self.grid[next_i][next_j] *= 2;
+                            self.grid[next_i][next_j] = points;
+                            self.score += points as u32;
                             break;
                         },
                         _ => break,
