@@ -12,14 +12,14 @@ use termion::raw::IntoRawMode;
 use termion::input::TermRead;
 use termion::event::Key;
 
-const DEFAULT_GRID_SIZE: u16 = 3;
+const DEFAULT_GRID_SIZE: usize = 3;
 
 fn main() {
     let stdout = stdout().into_raw_mode().unwrap();
     let mut screen = termion::screen::AlternateScreen::from(stdout);
 
     let grid_size = args().nth(1).map_or(DEFAULT_GRID_SIZE, |raw| {
-        raw.parse::<u16>().unwrap_or(DEFAULT_GRID_SIZE)
+        raw.parse::<usize>().unwrap_or(DEFAULT_GRID_SIZE)
     });
 
     let mut game = Game::new(grid_size);
@@ -42,14 +42,14 @@ fn main() {
 
 struct Game {
     grid: Vec<Vec<u8>>,
-    size: u16,
+    size: usize,
     score: u32,
 }
 
 impl Game {
-    fn new(size: u16) -> Game {
+    fn new(size: usize) -> Game {
         Game {
-            grid: vec![vec![1; size as usize]; size as usize],
+            grid: vec![vec![1; size]; size],
             size: size,
             score: 0,
         }
@@ -85,8 +85,8 @@ impl Game {
     }
 
     fn move_up(&mut self) {
-        for i in 0..self.size as usize {
-            for j in 0..self.size as usize {
+        for i in 0..self.size {
+            for j in 0..self.size {
 
                 let (cur_i, cur_j) = (i, j);
                 let cur_cell = self.grid[cur_i][cur_j];
@@ -115,8 +115,8 @@ impl Game {
     }
 
     fn move_down(&mut self) {
-        for i in 0..self.size as usize {
-            for j in 0..self.size as usize {
+        for i in 0..self.size {
+            for j in 0..self.size {
 
                 let (cur_i, cur_j) = (i, j);
                 let cur_cell = self.grid[cur_i][cur_j];
@@ -125,7 +125,7 @@ impl Game {
                 }
 
                 let next_j = cur_j;
-                for next_i in i+1..self.size as usize {
+                for next_i in i+1..self.size {
                     let next_cell = *match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
                         Some(x) => x,
                         None => break,
@@ -145,8 +145,8 @@ impl Game {
     }
 
     fn move_left(&mut self) {
-        for i in 0..self.size as usize {
-            for j in 0..self.size as usize {
+        for i in 0..self.size {
+            for j in 0..self.size {
 
                 let (cur_i, cur_j) = (i, j);
                 let cur_cell = self.grid[cur_i][cur_j];
@@ -175,8 +175,8 @@ impl Game {
     }
 
     fn move_right(&mut self) {
-        for i in 0..self.size as usize {
-            for j in 0..self.size as usize {
+        for i in 0..self.size {
+            for j in 0..self.size {
 
                 let (cur_i, cur_j) = (i, j);
                 let cur_cell = self.grid[cur_i][cur_j];
@@ -185,7 +185,7 @@ impl Game {
                 }
 
                 let next_i = cur_i;
-                for next_j in j+1..self.size as usize {
+                for next_j in j+1..self.size {
                     let next_cell = *match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
                         Some(x) => x,
                         None => break,
