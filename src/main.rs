@@ -32,22 +32,10 @@ fn main() {
     for key in stdin.keys() {
         match key.unwrap() {
             Key::Ctrl('c') | Key::Ctrl('q') => break,
-            Key::Up => {
-                game.move_up();
-                game.fill_random_cell();
-            },
-            Key::Right => {
-                game.move_right();
-                game.fill_random_cell();
-            },
-            Key::Down => {
-                game.move_down();
-                game.fill_random_cell();
-            },
-            Key::Left => {
-                game.move_left();
-                game.fill_random_cell();
-            },
+            Key::Up if game.has_moves() => game.move_up(),
+            Key::Right if game.has_moves() => game.move_right(),
+            Key::Down if game.has_moves() => game.move_down(),
+            Key::Left if game.has_moves() => game.move_left(),
             _ => {}
         }
         game.write_to(&mut screen).unwrap();
@@ -91,6 +79,11 @@ impl Game {
                 write!(w, "{}", cursor::Goto(1, total_height))?;
                 write!(w, "Score: {}", self.score)?;
 
+                if !self.has_moves() {
+                    write!(w, "{}", cursor::Goto(total_width-8, total_height))?;
+                    write!(w, "YOU LOST")?;
+                }
+
                 for (i, line) in self.grid.iter().enumerate() {
                     write!(w, "{}", cursor::Goto(left_pad, top_pad + i as u16))?;
                     for value in line {
@@ -102,6 +95,19 @@ impl Game {
                 w.flush()
             }
         }
+    }
+
+    fn has_moves(&self) -> bool {
+        for i in 0..self.size {
+            for j in 0..self.size {
+                if self.grid[i][j] == 0 ||
+                    self.grid[i][j] == self.grid[i][j+1] ||
+                    self.grid[i][j] == self.grid[i+1][j] {
+                    return true;
+                }
+            }
+        }
+        false
     }
 
     fn fill_random_cell(&mut self) {
@@ -118,6 +124,9 @@ impl Game {
     }
 
     fn move_up(&mut self) {
+
+        let mut moved = false;
+
         for i in 0..self.size {
             for j in 0..self.size {
 
@@ -135,12 +144,14 @@ impl Game {
                             self.grid[next_i][next_j] = cur_cell;
                             cur_i = next_i;
                             cur_j = next_j;
+                            moved = true;
                         },
                         Some(next_cell) if *next_cell == cur_cell => {
                             let points = cur_cell * 2;
                             self.grid[cur_i][cur_j] = 0;
                             self.grid[next_i][next_j] = points;
                             self.score += points as u32;
+                            moved = true;
                             break;
                         },
                         _ => break,
@@ -148,9 +159,16 @@ impl Game {
                 }
             }
         }
+
+        if moved {
+            self.fill_random_cell();
+        }
     }
 
     fn move_down(&mut self) {
+
+        let mut moved = false;
+
         for i in (0..self.size).rev() {
             for j in 0..self.size {
 
@@ -168,12 +186,14 @@ impl Game {
                             self.grid[next_i][next_j] = cur_cell;
                             cur_i = next_i;
                             cur_j = next_j;
+                            moved = true;
                         },
                         Some(next_cell) if *next_cell == cur_cell => {
                             let points = cur_cell * 2;
                             self.grid[cur_i][cur_j] = 0;
                             self.grid[next_i][next_j] = points;
                             self.score += points as u32;
+                            moved = true;
                             break;
                         },
                         _ => break,
@@ -181,9 +201,16 @@ impl Game {
                 }
             }
         }
+
+        if moved {
+            self.fill_random_cell();
+        }
     }
 
     fn move_left(&mut self) {
+
+        let mut moved = false;
+
         for i in 0..self.size {
             for j in 0..self.size {
 
@@ -201,12 +228,14 @@ impl Game {
                             self.grid[next_i][next_j] = cur_cell;
                             cur_i = next_i;
                             cur_j = next_j;
+                            moved = true;
                         },
                         Some(next_cell) if *next_cell == cur_cell => {
                             let points = cur_cell * 2;
                             self.grid[cur_i][cur_j] = 0;
                             self.grid[next_i][next_j] = points;
                             self.score += points as u32;
+                            moved = true;
                             break;
                         },
                         _ => break,
@@ -214,9 +243,16 @@ impl Game {
                 }
             }
         }
+
+        if moved {
+            self.fill_random_cell();
+        }
     }
 
     fn move_right(&mut self) {
+
+        let mut moved = false;
+
         for i in 0..self.size {
             for j in (0..self.size).rev() {
 
@@ -234,18 +270,24 @@ impl Game {
                             self.grid[next_i][next_j] = cur_cell;
                             cur_i = next_i;
                             cur_j = next_j;
+                            moved = true;
                         },
                         Some(next_cell) if *next_cell == cur_cell => {
                             let points = cur_cell * 2;
                             self.grid[cur_i][cur_j] = 0;
                             self.grid[next_i][next_j] = points;
                             self.score += points as u32;
+                            moved = true;
                             break;
                         },
                         _ => break,
                     };
                 }
             }
+        }
+
+        if moved {
+            self.fill_random_cell();
         }
     }
 
