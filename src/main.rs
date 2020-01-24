@@ -22,56 +22,23 @@ fn main() {
         raw.parse::<u16>().unwrap_or(DEFAULT_GRID_SIZE)
     });
 
-    let mut gm = GameManager::new(grid_size, &mut screen);
-    gm.flush().unwrap();
+    let mut game = Game::new(grid_size);
+    game.write_to(&mut screen).unwrap();
 
     let stdin = stdin();
     for key in stdin.keys() {
         match key.unwrap() {
             Key::Ctrl('c') | Key::Ctrl('q') => break,
-            Key::Up => gm.move_up(),
-            Key::Right => gm.move_right(),
-            Key::Down => gm.move_down(),
-            Key::Left => gm.move_left(),
+            Key::Up => game.move_up(),
+            Key::Right => game.move_right(),
+            Key::Down => game.move_down(),
+            Key::Left => game.move_left(),
             _ => {}
         }
-        gm.flush().unwrap()
+        game.write_to(&mut screen).unwrap();
     }
 }
 
-struct GameManager<'a> {
-    game: Game,
-    output: &'a mut Write,
-}
-
-impl<'a> GameManager<'a> {
-    fn new(size: u16, output: &'a mut Write) -> GameManager {
-        GameManager {
-            game: Game::new(size),
-            output: output,
-        }
-    }
-
-    fn flush(&mut self) -> io::Result<()> {
-        self.game.write_to(&mut self.output)
-    }
-
-    fn move_up(&mut self) {
-        self.game = self.game.move_up();
-    }
-
-    fn move_right(&mut self) {
-        self.game = self.game.move_right();
-    }
-
-    fn move_down(&mut self) {
-        self.game = self.game.move_down();
-    }
-
-    fn move_left(&mut self) {
-        self.game = self.game.move_left();
-    }
-}
 
 struct Game {
     grid: Vec<Vec<u8>>,
