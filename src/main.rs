@@ -1,16 +1,16 @@
 use std::env::args;
-use std::iter::Iterator;
 use std::io::{self, stdin, stdout, Write};
+use std::iter::Iterator;
 
 extern crate termion;
 use termion::clear;
 use termion::color;
-use termion::style;
 use termion::cursor;
-use termion::terminal_size;
-use termion::raw::IntoRawMode;
-use termion::input::TermRead;
 use termion::event::Key;
+use termion::input::TermRead;
+use termion::raw::IntoRawMode;
+use termion::style;
+use termion::terminal_size;
 
 extern crate rand;
 use rand::distributions::{Distribution, Uniform};
@@ -42,7 +42,6 @@ fn main() {
     }
 }
 
-
 struct Game {
     grid: Vec<Vec<u8>>,
     size: usize,
@@ -60,7 +59,7 @@ impl Game {
         };
         game.fill_random_cell();
         game.fill_random_cell();
-        return game
+        game
     }
 
     fn write_to(&self, w: &mut Write) -> io::Result<()> {
@@ -80,7 +79,7 @@ impl Game {
                 write!(w, "Score: {}", self.score)?;
 
                 if !self.has_moves() {
-                    write!(w, "{}", cursor::Goto(total_width-8, total_height))?;
+                    write!(w, "{}", cursor::Goto(total_width - 8, total_height))?;
                     write!(w, "YOU LOST")?;
                 }
 
@@ -100,9 +99,10 @@ impl Game {
     fn has_moves(&self) -> bool {
         for i in 0..self.size {
             for j in 0..self.size {
-                if self.grid[i][j] == 0 ||
-                    self.grid[i][j] == self.grid[i][j+1] ||
-                    self.grid[i][j] == self.grid[i+1][j] {
+                if self.grid[i][j] == 0
+                    || self.grid[i][j] == self.grid[i][j + 1]
+                    || self.grid[i][j] == self.grid[i + 1][j]
+                {
                     return true;
                 }
             }
@@ -124,16 +124,14 @@ impl Game {
     }
 
     fn move_up(&mut self) {
-
         let mut moved = false;
 
         for i in 0..self.size {
             for j in 0..self.size {
-
                 let (mut cur_i, mut cur_j) = (i, j);
                 let cur_cell = self.grid[cur_i][cur_j];
                 if cur_cell == 0 {
-                    continue
+                    continue;
                 }
 
                 let next_j = cur_j;
@@ -145,7 +143,7 @@ impl Game {
                             cur_i = next_i;
                             cur_j = next_j;
                             moved = true;
-                        },
+                        }
                         Some(next_cell) if *next_cell == cur_cell => {
                             let points = cur_cell * 2;
                             self.grid[cur_i][cur_j] = 0;
@@ -153,7 +151,7 @@ impl Game {
                             self.score += points as u32;
                             moved = true;
                             break;
-                        },
+                        }
                         _ => break,
                     };
                 }
@@ -166,20 +164,18 @@ impl Game {
     }
 
     fn move_down(&mut self) {
-
         let mut moved = false;
 
         for i in (0..self.size).rev() {
             for j in 0..self.size {
-
                 let (mut cur_i, mut cur_j) = (i, j);
                 let cur_cell = self.grid[cur_i][cur_j];
                 if cur_cell == 0 {
-                    continue
+                    continue;
                 }
 
                 let next_j = cur_j;
-                for next_i in i+1..self.size {
+                for next_i in i + 1..self.size {
                     match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
                         Some(0) => {
                             self.grid[cur_i][cur_j] = 0;
@@ -187,7 +183,7 @@ impl Game {
                             cur_i = next_i;
                             cur_j = next_j;
                             moved = true;
-                        },
+                        }
                         Some(next_cell) if *next_cell == cur_cell => {
                             let points = cur_cell * 2;
                             self.grid[cur_i][cur_j] = 0;
@@ -195,7 +191,7 @@ impl Game {
                             self.score += points as u32;
                             moved = true;
                             break;
-                        },
+                        }
                         _ => break,
                     };
                 }
@@ -208,16 +204,14 @@ impl Game {
     }
 
     fn move_left(&mut self) {
-
         let mut moved = false;
 
         for i in 0..self.size {
             for j in 0..self.size {
-
                 let (mut cur_i, mut cur_j) = (i, j);
                 let cur_cell = self.grid[cur_i][cur_j];
                 if cur_cell == 0 {
-                    continue
+                    continue;
                 }
 
                 let next_i = cur_i;
@@ -229,7 +223,7 @@ impl Game {
                             cur_i = next_i;
                             cur_j = next_j;
                             moved = true;
-                        },
+                        }
                         Some(next_cell) if *next_cell == cur_cell => {
                             let points = cur_cell * 2;
                             self.grid[cur_i][cur_j] = 0;
@@ -237,7 +231,7 @@ impl Game {
                             self.score += points as u32;
                             moved = true;
                             break;
-                        },
+                        }
                         _ => break,
                     };
                 }
@@ -250,20 +244,18 @@ impl Game {
     }
 
     fn move_right(&mut self) {
-
         let mut moved = false;
 
         for i in 0..self.size {
             for j in (0..self.size).rev() {
-
                 let (mut cur_i, mut cur_j) = (i, j);
                 let cur_cell = self.grid[cur_i][cur_j];
                 if cur_cell == 0 {
-                    continue
+                    continue;
                 }
 
                 let next_i = cur_i;
-                for next_j in j+1..self.size {
+                for next_j in j + 1..self.size {
                     match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
                         Some(0) => {
                             self.grid[cur_i][cur_j] = 0;
@@ -271,7 +263,7 @@ impl Game {
                             cur_i = next_i;
                             cur_j = next_j;
                             moved = true;
-                        },
+                        }
                         Some(next_cell) if *next_cell == cur_cell => {
                             let points = cur_cell * 2;
                             self.grid[cur_i][cur_j] = 0;
@@ -279,7 +271,7 @@ impl Game {
                             self.score += points as u32;
                             moved = true;
                             break;
-                        },
+                        }
                         _ => break,
                     };
                 }
