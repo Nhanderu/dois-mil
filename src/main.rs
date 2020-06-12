@@ -28,10 +28,10 @@ fn main() {
     });
 
     let mut game = Game::new(grid_size);
+    game.fill_random_cells();
     game.write_to(&mut screen).unwrap();
 
-    let stdin = stdin();
-    for key in stdin.keys() {
+    for key in stdin().keys() {
         match key.unwrap() {
             Key::Ctrl('c') | Key::Ctrl('q') => break,
             Key::Up if game.has_moves() => game.move_up(),
@@ -55,16 +55,14 @@ struct Game {
 
 impl Game {
     fn new(size: usize) -> Game {
-        let mut game = Game {
+        Game {
             grid: vec![vec![0; size]; size],
             size: size,
             score: 0,
             random_pos: Uniform::from(0..size),
             random_val: WeightedIndex::new(RANDOM_VALUES.iter().map(|item| item.1)).unwrap(),
             new_val: RANDOM_VALUES.iter().map(|item| item.0).collect(),
-        };
-        game.fill_random_cells();
-        game
+        }
     }
 
     fn write_to(&self, w: &mut dyn Write) -> io::Result<()> {
