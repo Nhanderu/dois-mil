@@ -83,7 +83,10 @@ impl Game {
                 write!(w, "{}", cursor::Goto(1, total_height))?;
                 write!(w, "Score: {}", self.score)?;
 
-                if !self.has_moves() {
+                if self.any_bigger_than(2048) {
+                    write!(w, "{}", cursor::Goto(total_width - 8, total_height))?;
+                    write!(w, "YOU WON")?;
+                } else if !self.has_moves() {
                     write!(w, "{}", cursor::Goto(total_width - 8, total_height))?;
                     write!(w, "YOU LOST")?;
                 }
@@ -108,6 +111,17 @@ impl Game {
                     || (j != self.size - 1 && self.grid[i][j] == self.grid[i][j + 1])
                     || (i != self.size - 1 && self.grid[i][j] == self.grid[i + 1][j])
                 {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    fn any_bigger_than(&self, n: u32) -> bool {
+        for i in 0..self.size {
+            for j in 0..self.size {
+                if self.grid[i][j] > n {
                     return true;
                 }
             }
