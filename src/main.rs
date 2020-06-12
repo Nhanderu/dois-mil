@@ -62,7 +62,7 @@ impl Game {
         game
     }
 
-    fn write_to(&self, w: &mut Write) -> io::Result<()> {
+    fn write_to(&self, w: &mut dyn Write) -> io::Result<()> {
         write!(w, "{}", clear::All)?;
 
         let (total_width, total_height) = terminal_size()?;
@@ -100,8 +100,8 @@ impl Game {
         for i in 0..self.size {
             for j in 0..self.size {
                 if self.grid[i][j] == 0
-                    || self.grid[i][j] == self.grid[i][j + 1]
-                    || self.grid[i][j] == self.grid[i + 1][j]
+                    || (j != self.size-1 && self.grid[i][j] == self.grid[i][j + 1])
+                    || (i != self.size-1 && self.grid[i][j] == self.grid[i + 1][j])
                 {
                     return true;
                 }
