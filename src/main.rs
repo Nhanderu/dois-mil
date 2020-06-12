@@ -13,9 +13,11 @@ use termion::style;
 use termion::terminal_size;
 
 extern crate rand;
-use rand::distributions::{Distribution, Uniform};
+use rand::distributions::{Distribution, Uniform, WeightedIndex};
+use rand::random;
 
-const DEFAULT_GRID_SIZE: usize = 3;
+const DEFAULT_GRID_SIZE: usize = 4;
+const RANDOM_VALUES: [(u8, usize); 2] = [(2, 2), (4, 1)];
 
 fn main() {
     let stdout = stdout().into_raw_mode().unwrap();
@@ -47,6 +49,8 @@ struct Game {
     size: usize,
     score: u32,
     random_pos: Uniform<usize>,
+    random_val: WeightedIndex<usize>,
+    new_val: Vec<u8>,
 }
 
 impl Game {
@@ -56,9 +60,10 @@ impl Game {
             size: size,
             score: 0,
             random_pos: Uniform::from(0..size),
+            random_val: WeightedIndex::new(RANDOM_VALUES.iter().map(|item| item.1)).unwrap(),
+            new_val: RANDOM_VALUES.iter().map(|item| item.0).collect(),
         };
-        game.fill_random_cell();
-        game.fill_random_cell();
+        game.fill_random_cells();
         game
     }
 
@@ -110,15 +115,19 @@ impl Game {
         false
     }
 
-    fn fill_random_cell(&mut self) {
+    fn fill_random_cells(&mut self) {
+        let mut once = false;
         let mut rng = rand::thread_rng();
         loop {
             let i = self.random_pos.sample(&mut rng);
             let j = self.random_pos.sample(&mut rng);
 
             if self.grid[i][j] == 0 {
-                self.grid[i][j] = 2;
-                break;
+                self.grid[i][j] = self.new_val[self.random_val.sample(&mut rng)];
+                if once || random() {
+                    break;
+                }
+                once = true;
             }
         }
     }
@@ -159,7 +168,7 @@ impl Game {
         }
 
         if moved {
-            self.fill_random_cell();
+            self.fill_random_cells();
         }
     }
 
@@ -199,7 +208,7 @@ impl Game {
         }
 
         if moved {
-            self.fill_random_cell();
+            self.fill_random_cells();
         }
     }
 
@@ -239,7 +248,7 @@ impl Game {
         }
 
         if moved {
-            self.fill_random_cell();
+            self.fill_random_cells();
         }
     }
 
@@ -279,7 +288,7 @@ impl Game {
         }
 
         if moved {
-            self.fill_random_cell();
+            self.fill_random_cells();
         }
     }
 
