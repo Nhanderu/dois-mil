@@ -17,7 +17,7 @@ use rand::distributions::{Distribution, Uniform, WeightedIndex};
 use rand::random;
 
 const DEFAULT_GRID_SIZE: usize = 4;
-const RANDOM_VALUES: [(u8, usize); 2] = [(2, 2), (4, 1)];
+const RANDOM_VALUES: [(u32, usize); 2] = [(2, 2), (4, 1)];
 
 fn main() {
     let stdout = stdout().into_raw_mode().unwrap();
@@ -45,12 +45,12 @@ fn main() {
 }
 
 struct Game {
-    grid: Vec<Vec<u8>>,
+    grid: Vec<Vec<u32>>,
     size: usize,
     score: u32,
     random_pos: Uniform<usize>,
     random_val: WeightedIndex<usize>,
-    new_val: Vec<u8>,
+    new_val: Vec<u32>,
 }
 
 impl Game {
