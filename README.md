@@ -7,6 +7,9 @@
 - [x] Discover how to mutate a `Vec` while iterating over it
 - [x] Set initial random values
 - [x] Win/lose
+- [ ] Better error handling
+- [ ] Fix code repetition
+- [ ] Game saving
 
 ## License
 
