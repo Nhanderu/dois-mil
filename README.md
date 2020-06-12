@@ -4,9 +4,9 @@
 
 ## To-do
 
-- [ ] Discover how to mutate a `Vec` while iterating over it
-- [ ] Set initial random values
-- [ ] Win/lose
+- [x] Discover how to mutate a `Vec` while iterating over it
+- [x] Set initial random values
+- [x] Win/lose
 
 ## License
 
