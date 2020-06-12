@@ -100,8 +100,8 @@ impl Game {
         for i in 0..self.size {
             for j in 0..self.size {
                 if self.grid[i][j] == 0
-                    || (j != self.size-1 && self.grid[i][j] == self.grid[i][j + 1])
-                    || (i != self.size-1 && self.grid[i][j] == self.grid[i + 1][j])
+                    || (j != self.size - 1 && self.grid[i][j] == self.grid[i][j + 1])
+                    || (i != self.size - 1 && self.grid[i][j] == self.grid[i + 1][j])
                 {
                     return true;
                 }
