@@ -12,6 +12,7 @@
 - [ ] Better error handling
 - [x] Fix code repetition
 - [ ] Game saving
+- [ ] Add colors
 
 ## License
 
