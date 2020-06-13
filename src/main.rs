@@ -17,7 +17,7 @@ use rand::distributions::{Distribution, Uniform, WeightedIndex};
 use rand::random;
 
 const DEFAULT_GRID_SIZE: usize = 4;
-const RANDOM_VALUES: [(u32, usize); 2] = [(2, 2), (4, 1)];
+const RANDOM_VALUES_WEIGHT: [(u32, usize); 2] = [(2, 2), (4, 1)];
 
 fn main() {
     let stdout = stdout().into_raw_mode().unwrap();
@@ -33,7 +33,7 @@ fn main() {
 
     for key in stdin().keys() {
         match key.unwrap() {
-            Key::Ctrl('c') | Key::Ctrl('q') => break,
+            Key::Char('q') | Key::Ctrl('q') | Key::Ctrl('c') => break,
             Key::Up if game.has_moves() => game.move_up(),
             Key::Right if game.has_moves() => game.move_right(),
             Key::Down if game.has_moves() => game.move_down(),
@@ -60,8 +60,8 @@ impl Game {
             size: size,
             score: 0,
             random_pos: Uniform::from(0..size),
-            random_val: WeightedIndex::new(RANDOM_VALUES.iter().map(|item| item.1)).unwrap(),
-            new_val: RANDOM_VALUES.iter().map(|item| item.0).collect(),
+            random_val: WeightedIndex::new(RANDOM_VALUES_WEIGHT.iter().map(|item| item.1)).unwrap(),
+            new_val: RANDOM_VALUES_WEIGHT.iter().map(|item| item.0).collect(),
         }
     }
 
@@ -116,9 +116,9 @@ impl Game {
         false
     }
 
-    fn any<F>(&self, f: F) -> bool
+    fn any<T>(&self, f: T) -> bool
     where
-        F: Fn(u32) -> bool,
+        T: Fn(u32) -> bool,
     {
         for i in 0..self.size {
             for j in 0..self.size {
@@ -152,182 +152,6 @@ impl Game {
         }
     }
 
-    fn move_up(&mut self) {
-        let mut moved = false;
-        let mut moved_cells = vec![vec![false; self.size]; self.size];
-
-        for i in 0..self.size {
-            for j in 0..self.size {
-                let (mut cur_i, mut cur_j) = (i, j);
-                let cur_cell = self.grid[cur_i][cur_j];
-                if cur_cell == 0 {
-                    continue;
-                }
-
-                let next_j = cur_j;
-                for next_i in (0..i).rev() {
-                    match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
-                        Some(0) => {
-                            self.grid[cur_i][cur_j] = 0;
-                            self.grid[next_i][next_j] = cur_cell;
-                            cur_i = next_i;
-                            cur_j = next_j;
-                            moved = true;
-                        }
-                        Some(next_cell)
-                            if *next_cell == cur_cell && !moved_cells[next_i][next_j] =>
-                        {
-                            let points = cur_cell * 2;
-                            self.grid[cur_i][cur_j] = 0;
-                            self.grid[next_i][next_j] = points;
-                            self.score += points as u32;
-                            moved = true;
-                            moved_cells[next_i][next_j] = true;
-                            break;
-                        }
-                        _ => break,
-                    };
-                }
-            }
-        }
-
-        if moved {
-            self.fill_random_cells();
-        }
-    }
-
-    fn move_down(&mut self) {
-        let mut moved = false;
-        let mut moved_cells = vec![vec![false; self.size]; self.size];
-
-        for i in (0..self.size).rev() {
-            for j in 0..self.size {
-                let (mut cur_i, mut cur_j) = (i, j);
-                let cur_cell = self.grid[cur_i][cur_j];
-                if cur_cell == 0 {
-                    continue;
-                }
-
-                let next_j = cur_j;
-                for next_i in i + 1..self.size {
-                    match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
-                        Some(0) => {
-                            self.grid[cur_i][cur_j] = 0;
-                            self.grid[next_i][next_j] = cur_cell;
-                            cur_i = next_i;
-                            cur_j = next_j;
-                            moved = true;
-                        }
-                        Some(next_cell)
-                            if *next_cell == cur_cell && !moved_cells[next_i][next_j] =>
-                        {
-                            let points = cur_cell * 2;
-                            self.grid[cur_i][cur_j] = 0;
-                            self.grid[next_i][next_j] = points;
-                            self.score += points as u32;
-                            moved = true;
-                            moved_cells[next_i][next_j] = true;
-                            break;
-                        }
-                        _ => break,
-                    };
-                }
-            }
-        }
-
-        if moved {
-            self.fill_random_cells();
-        }
-    }
-
-    fn move_left(&mut self) {
-        let mut moved = false;
-        let mut moved_cells = vec![vec![false; self.size]; self.size];
-
-        for i in 0..self.size {
-            for j in 0..self.size {
-                let (mut cur_i, mut cur_j) = (i, j);
-                let cur_cell = self.grid[cur_i][cur_j];
-                if cur_cell == 0 {
-                    continue;
-                }
-
-                let next_i = cur_i;
-                for next_j in (0..j).rev() {
-                    match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
-                        Some(0) => {
-                            self.grid[cur_i][cur_j] = 0;
-                            self.grid[next_i][next_j] = cur_cell;
-                            cur_i = next_i;
-                            cur_j = next_j;
-                            moved = true;
-                        }
-                        Some(next_cell)
-                            if *next_cell == cur_cell && !moved_cells[next_i][next_j] =>
-                        {
-                            let points = cur_cell * 2;
-                            self.grid[cur_i][cur_j] = 0;
-                            self.grid[next_i][next_j] = points;
-                            self.score += points as u32;
-                            moved = true;
-                            moved_cells[next_i][next_j] = true;
-                            break;
-                        }
-                        _ => break,
-                    };
-                }
-            }
-        }
-
-        if moved {
-            self.fill_random_cells();
-        }
-    }
-
-    fn move_right(&mut self) {
-        let mut moved = false;
-        let mut moved_cells = vec![vec![false; self.size]; self.size];
-
-        for i in 0..self.size {
-            for j in (0..self.size).rev() {
-                let (mut cur_i, mut cur_j) = (i, j);
-                let cur_cell = self.grid[cur_i][cur_j];
-                if cur_cell == 0 {
-                    continue;
-                }
-
-                let next_i = cur_i;
-                for next_j in j + 1..self.size {
-                    match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
-                        Some(0) => {
-                            self.grid[cur_i][cur_j] = 0;
-                            self.grid[next_i][next_j] = cur_cell;
-                            cur_i = next_i;
-                            cur_j = next_j;
-                            moved = true;
-                        }
-                        Some(next_cell)
-                            if *next_cell == cur_cell && !moved_cells[next_i][next_j] =>
-                        {
-                            let points = cur_cell * 2;
-                            self.grid[cur_i][cur_j] = 0;
-                            self.grid[next_i][next_j] = points;
-                            self.score += points as u32;
-                            moved = true;
-                            moved_cells[next_i][next_j] = true;
-                            break;
-                        }
-                        _ => break,
-                    };
-                }
-            }
-        }
-
-        if moved {
-            self.fill_random_cells();
-        }
-    }
-
     fn get_padding(&self, total_width: u16, total_height: u16) -> Option<(u16, u16)> {
         let grid_width = (self.size * 6) + (self.size + 1);
         let grid_height = self.size + 1;
@@ -341,6 +165,97 @@ impl Game {
             let left_pad = (horizontal as f64 / 2.0).ceil() as u16;
             let top_pad = (vertical as f64 / 2.0).ceil() as u16;
             Some((left_pad, top_pad))
+        }
+    }
+
+    fn move_up(&mut self) {
+        let grid_size = self.size;
+        self.move_cells(
+            0..grid_size,
+            0..grid_size,
+            |i, _| (0..i).rev(),
+            |_, j, k| (k, j),
+        );
+    }
+
+    fn move_down(&mut self) {
+        let grid_size = self.size;
+        self.move_cells(
+            (0..grid_size).rev(),
+            0..grid_size,
+            |i, _| i + 1..grid_size,
+            |_, j, k| (k, j),
+        );
+    }
+
+    fn move_left(&mut self) {
+        let grid_size = self.size;
+        self.move_cells(
+            0..grid_size,
+            0..grid_size,
+            |_, j| (0..j).rev(),
+            |i, _, k| (i, k),
+        );
+    }
+
+    fn move_right(&mut self) {
+        let grid_size = self.size;
+        self.move_cells(
+            0..grid_size,
+            (0..grid_size).rev(),
+            |_, j| j + 1..grid_size,
+            |i, _, k| (i, k),
+        );
+    }
+
+    fn move_cells<T, U, V, W, X>(&mut self, i_range: T, j_range: U, k_range: W, next_cell: X)
+    where
+        T: std::iter::Iterator<Item = usize>,
+        U: std::iter::Iterator<Item = usize> + Clone,
+        V: std::iter::Iterator<Item = usize>,
+        W: Fn(usize, usize) -> V,
+        X: Fn(usize, usize, usize) -> (usize, usize),
+    {
+        let mut moved = false;
+        let mut moved_cells = vec![vec![false; self.size]; self.size];
+
+        for i in i_range {
+            for j in j_range.clone() {
+                let (mut cur_i, mut cur_j) = (i, j);
+                let cur_cell = self.grid[cur_i][cur_j];
+                if cur_cell == 0 {
+                    continue;
+                }
+
+                for k in k_range(i, j) {
+                    let (next_i, next_j) = next_cell(i, j, k);
+                    match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
+                        Some(0) => {
+                            self.grid[cur_i][cur_j] = 0;
+                            self.grid[next_i][next_j] = cur_cell;
+                            cur_i = next_i;
+                            cur_j = next_j;
+                            moved = true;
+                        }
+                        Some(next_cell)
+                            if *next_cell == cur_cell && !moved_cells[next_i][next_j] =>
+                        {
+                            let points = cur_cell * 2;
+                            self.grid[cur_i][cur_j] = 0;
+                            self.grid[next_i][next_j] = points;
+                            self.score += points as u32;
+                            moved = true;
+                            moved_cells[next_i][next_j] = true;
+                            break;
+                        }
+                        _ => break,
+                    };
+                }
+            }
+        }
+
+        if moved {
+            self.fill_random_cells();
         }
     }
 }
