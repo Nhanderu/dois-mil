@@ -154,6 +154,7 @@ impl Game {
 
     fn move_up(&mut self) {
         let mut moved = false;
+        let mut moved_cells = vec![vec![false; self.size]; self.size];
 
         for i in 0..self.size {
             for j in 0..self.size {
@@ -173,12 +174,15 @@ impl Game {
                             cur_j = next_j;
                             moved = true;
                         }
-                        Some(next_cell) if *next_cell == cur_cell => {
+                        Some(next_cell)
+                            if *next_cell == cur_cell && !moved_cells[next_i][next_j] =>
+                        {
                             let points = cur_cell * 2;
                             self.grid[cur_i][cur_j] = 0;
                             self.grid[next_i][next_j] = points;
                             self.score += points as u32;
                             moved = true;
+                            moved_cells[next_i][next_j] = true;
                             break;
                         }
                         _ => break,
@@ -194,6 +198,7 @@ impl Game {
 
     fn move_down(&mut self) {
         let mut moved = false;
+        let mut moved_cells = vec![vec![false; self.size]; self.size];
 
         for i in (0..self.size).rev() {
             for j in 0..self.size {
@@ -213,12 +218,15 @@ impl Game {
                             cur_j = next_j;
                             moved = true;
                         }
-                        Some(next_cell) if *next_cell == cur_cell => {
+                        Some(next_cell)
+                            if *next_cell == cur_cell && !moved_cells[next_i][next_j] =>
+                        {
                             let points = cur_cell * 2;
                             self.grid[cur_i][cur_j] = 0;
                             self.grid[next_i][next_j] = points;
                             self.score += points as u32;
                             moved = true;
+                            moved_cells[next_i][next_j] = true;
                             break;
                         }
                         _ => break,
@@ -234,6 +242,7 @@ impl Game {
 
     fn move_left(&mut self) {
         let mut moved = false;
+        let mut moved_cells = vec![vec![false; self.size]; self.size];
 
         for i in 0..self.size {
             for j in 0..self.size {
@@ -253,12 +262,15 @@ impl Game {
                             cur_j = next_j;
                             moved = true;
                         }
-                        Some(next_cell) if *next_cell == cur_cell => {
+                        Some(next_cell)
+                            if *next_cell == cur_cell && !moved_cells[next_i][next_j] =>
+                        {
                             let points = cur_cell * 2;
                             self.grid[cur_i][cur_j] = 0;
                             self.grid[next_i][next_j] = points;
                             self.score += points as u32;
                             moved = true;
+                            moved_cells[next_i][next_j] = true;
                             break;
                         }
                         _ => break,
@@ -274,6 +286,7 @@ impl Game {
 
     fn move_right(&mut self) {
         let mut moved = false;
+        let mut moved_cells = vec![vec![false; self.size]; self.size];
 
         for i in 0..self.size {
             for j in (0..self.size).rev() {
@@ -293,12 +306,15 @@ impl Game {
                             cur_j = next_j;
                             moved = true;
                         }
-                        Some(next_cell) if *next_cell == cur_cell => {
+                        Some(next_cell)
+                            if *next_cell == cur_cell && !moved_cells[next_i][next_j] =>
+                        {
                             let points = cur_cell * 2;
                             self.grid[cur_i][cur_j] = 0;
                             self.grid[next_i][next_j] = points;
                             self.score += points as u32;
                             moved = true;
+                            moved_cells[next_i][next_j] = true;
                             break;
                         }
                         _ => break,
