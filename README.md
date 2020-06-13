@@ -7,7 +7,7 @@
 - [x] Discover how to mutate a `Vec` while iterating over it
 - [x] Set initial random values
 - [x] Win/lose
-- [ ] Fix: someway somehow, the game stops and there's no reason for it
+- [x] Fix: someway somehow, the game stops and there's no reason for it
 - [ ] Fix: multiple calculations at once, e.g. a line with "8 8 16" resulting with 32 with one move
 - [ ] Better error handling
 - [ ] Fix code repetition

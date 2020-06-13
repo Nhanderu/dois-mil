@@ -81,7 +81,7 @@ impl Game {
                 write!(w, "{}", cursor::Goto(1, total_height))?;
                 write!(w, "Score: {}", self.score)?;
 
-                if self.any_bigger_than(2048) {
+                if self.any(|x| x > 2048) {
                     write!(w, "{}", cursor::Goto(total_width - 8, total_height))?;
                     write!(w, "YOU WON")?;
                 } else if !self.has_moves() {
@@ -116,10 +116,13 @@ impl Game {
         false
     }
 
-    fn any_bigger_than(&self, n: u32) -> bool {
+    fn any<F>(&self, f: F) -> bool
+    where
+        F: Fn(u32) -> bool,
+    {
         for i in 0..self.size {
             for j in 0..self.size {
-                if self.grid[i][j] > n {
+                if f(self.grid[i][j]) {
                     return true;
                 }
             }
@@ -128,18 +131,23 @@ impl Game {
     }
 
     fn fill_random_cells(&mut self) {
-        let mut once = false;
+        let mut count = 0;
         let mut rng = rand::thread_rng();
         loop {
+            if count == 2 || !self.any(|x| x == 0) {
+                return;
+            }
+
             let i = self.random_pos.sample(&mut rng);
             let j = self.random_pos.sample(&mut rng);
 
             if self.grid[i][j] == 0 {
                 self.grid[i][j] = self.new_val[self.random_val.sample(&mut rng)];
-                if once || random() {
+                count += 1;
+
+                if random() {
                     break;
                 }
-                once = true;
             }
         }
     }
