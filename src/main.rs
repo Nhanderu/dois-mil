@@ -67,6 +67,112 @@ impl Game {
         }
     }
 
+    fn move_up(&mut self, w: &mut dyn Write) -> io::Result<()> {
+        let grid_size = self.size;
+        self.move_cells(
+            0..grid_size,
+            0..grid_size,
+            |i, _| (0..i).rev(),
+            |_, j, k| (k, j),
+        );
+        self.write_to(w)
+    }
+
+    fn move_down(&mut self, w: &mut dyn Write) -> io::Result<()> {
+        let grid_size = self.size;
+        self.move_cells(
+            (0..grid_size).rev(),
+            0..grid_size,
+            |i, _| i + 1..grid_size,
+            |_, j, k| (k, j),
+        );
+        self.write_to(w)
+    }
+
+    fn move_left(&mut self, w: &mut dyn Write) -> io::Result<()> {
+        let grid_size = self.size;
+        self.move_cells(
+            0..grid_size,
+            0..grid_size,
+            |_, j| (0..j).rev(),
+            |i, _, k| (i, k),
+        );
+        self.write_to(w)
+    }
+
+    fn move_right(&mut self, w: &mut dyn Write) -> io::Result<()> {
+        let grid_size = self.size;
+        self.move_cells(
+            0..grid_size,
+            (0..grid_size).rev(),
+            |_, j| j + 1..grid_size,
+            |i, _, k| (i, k),
+        );
+        self.write_to(w)
+    }
+
+    fn reset(&self, w: &mut dyn Write) -> io::Result<()> {
+        write!(
+            w,
+            "{}{}{}{}",
+            cursor::Restore,
+            style::Reset,
+            color::Bg(color::Reset),
+            color::Fg(color::Reset),
+        )
+    }
+
+    fn move_cells<T, U, V, W, X>(&mut self, i_range: T, j_range: U, k_range: W, next_cell: X)
+    where
+        T: std::iter::Iterator<Item = usize>,
+        U: std::iter::Iterator<Item = usize> + Clone,
+        V: std::iter::Iterator<Item = usize>,
+        W: Fn(usize, usize) -> V,
+        X: Fn(usize, usize, usize) -> (usize, usize),
+    {
+        let mut moved = false;
+        let mut moved_cells = vec![vec![false; self.size]; self.size];
+
+        for i in i_range {
+            for j in j_range.clone() {
+                let (mut cur_i, mut cur_j) = (i, j);
+                let cur_cell = self.grid[cur_i][cur_j];
+                if cur_cell == 0 {
+                    continue;
+                }
+
+                for k in k_range(i, j) {
+                    let (next_i, next_j) = next_cell(i, j, k);
+                    match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
+                        Some(0) => {
+                            self.grid[cur_i][cur_j] = 0;
+                            self.grid[next_i][next_j] = cur_cell;
+                            cur_i = next_i;
+                            cur_j = next_j;
+                            moved = true;
+                        }
+                        Some(next_cell)
+                            if *next_cell == cur_cell && !moved_cells[next_i][next_j] =>
+                        {
+                            let points = cur_cell * 2;
+                            self.grid[cur_i][cur_j] = 0;
+                            self.grid[next_i][next_j] = points;
+                            self.score += points as u32;
+                            moved = true;
+                            moved_cells[next_i][next_j] = true;
+                            break;
+                        }
+                        _ => break,
+                    };
+                }
+            }
+        }
+
+        if moved {
+            self.fill_random_cells();
+        }
+    }
+
     fn write_to(&self, w: &mut dyn Write) -> io::Result<()> {
         write!(w, "{}", clear::All)?;
 
@@ -194,112 +300,6 @@ impl Game {
             let left_pad = (horizontal as f64 / 2.0).ceil() as u16;
             let top_pad = (vertical as f64 / 2.0).ceil() as u16;
             Some((left_pad, top_pad))
-        }
-    }
-
-    fn move_up(&mut self, w: &mut dyn Write) -> io::Result<()> {
-        let grid_size = self.size;
-        self.move_cells(
-            0..grid_size,
-            0..grid_size,
-            |i, _| (0..i).rev(),
-            |_, j, k| (k, j),
-        );
-        self.write_to(w)
-    }
-
-    fn move_down(&mut self, w: &mut dyn Write) -> io::Result<()> {
-        let grid_size = self.size;
-        self.move_cells(
-            (0..grid_size).rev(),
-            0..grid_size,
-            |i, _| i + 1..grid_size,
-            |_, j, k| (k, j),
-        );
-        self.write_to(w)
-    }
-
-    fn move_left(&mut self, w: &mut dyn Write) -> io::Result<()> {
-        let grid_size = self.size;
-        self.move_cells(
-            0..grid_size,
-            0..grid_size,
-            |_, j| (0..j).rev(),
-            |i, _, k| (i, k),
-        );
-        self.write_to(w)
-    }
-
-    fn move_right(&mut self, w: &mut dyn Write) -> io::Result<()> {
-        let grid_size = self.size;
-        self.move_cells(
-            0..grid_size,
-            (0..grid_size).rev(),
-            |_, j| j + 1..grid_size,
-            |i, _, k| (i, k),
-        );
-        self.write_to(w)
-    }
-
-    fn reset(&self, w: &mut dyn Write) -> io::Result<()> {
-        write!(
-            w,
-            "{}{}{}{}",
-            cursor::Restore,
-            style::Reset,
-            color::Bg(color::Reset),
-            color::Fg(color::Reset),
-        )
-    }
-
-    fn move_cells<T, U, V, W, X>(&mut self, i_range: T, j_range: U, k_range: W, next_cell: X)
-    where
-        T: std::iter::Iterator<Item = usize>,
-        U: std::iter::Iterator<Item = usize> + Clone,
-        V: std::iter::Iterator<Item = usize>,
-        W: Fn(usize, usize) -> V,
-        X: Fn(usize, usize, usize) -> (usize, usize),
-    {
-        let mut moved = false;
-        let mut moved_cells = vec![vec![false; self.size]; self.size];
-
-        for i in i_range {
-            for j in j_range.clone() {
-                let (mut cur_i, mut cur_j) = (i, j);
-                let cur_cell = self.grid[cur_i][cur_j];
-                if cur_cell == 0 {
-                    continue;
-                }
-
-                for k in k_range(i, j) {
-                    let (next_i, next_j) = next_cell(i, j, k);
-                    match self.grid.get(next_i).and_then(|x| x.get(next_j)) {
-                        Some(0) => {
-                            self.grid[cur_i][cur_j] = 0;
-                            self.grid[next_i][next_j] = cur_cell;
-                            cur_i = next_i;
-                            cur_j = next_j;
-                            moved = true;
-                        }
-                        Some(next_cell)
-                            if *next_cell == cur_cell && !moved_cells[next_i][next_j] =>
-                        {
-                            let points = cur_cell * 2;
-                            self.grid[cur_i][cur_j] = 0;
-                            self.grid[next_i][next_j] = points;
-                            self.score += points as u32;
-                            moved = true;
-                            moved_cells[next_i][next_j] = true;
-                            break;
-                        }
-                        _ => break,
-                    };
-                }
-            }
-        }
-
-        if moved {
-            self.fill_random_cells();
         }
     }
 }
