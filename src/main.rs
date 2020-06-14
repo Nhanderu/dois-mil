@@ -1,4 +1,5 @@
 use std::env::args;
+use std::fmt::Display;
 use std::io::{self, stdin, stdout, Write};
 use std::iter::Iterator;
 
@@ -33,14 +34,15 @@ fn main() {
 
     for key in stdin().keys() {
         match key.unwrap() {
-            Key::Char('q') | Key::Ctrl('q') | Key::Ctrl('c') => break,
-            Key::Up if game.has_moves() => game.move_up(),
-            Key::Right if game.has_moves() => game.move_right(),
-            Key::Down if game.has_moves() => game.move_down(),
-            Key::Left if game.has_moves() => game.move_left(),
+            Key::Up if game.has_moves() => game.move_up(&mut screen).unwrap(),
+            Key::Right if game.has_moves() => game.move_right(&mut screen).unwrap(),
+            Key::Down if game.has_moves() => game.move_down(&mut screen).unwrap(),
+            Key::Left if game.has_moves() => game.move_left(&mut screen).unwrap(),
+            Key::Char('q') | Key::Ctrl('q') | Key::Ctrl('c') => {
+                return game.reset(&mut screen).unwrap()
+            }
             _ => {}
         }
-        game.write_to(&mut screen).unwrap();
     }
 }
 
@@ -70,32 +72,59 @@ impl Game {
 
         let (total_width, total_height) = terminal_size()?;
         match self.get_padding(total_width, total_height) {
-            None => write!(
-                w,
-                "{red}INVALIDSIZE{reset}",
-                red = color::Fg(color::Red),
-                reset = style::Reset,
-            ),
-
+            None => Ok(()),
             Some((left_pad, top_pad)) => {
-                write!(w, "{}", cursor::Goto(1, total_height))?;
-                write!(w, "Score: {}", self.score)?;
-
-                if self.any(|x| x > 2048) {
-                    write!(w, "{}", cursor::Goto(total_width - 8, total_height))?;
-                    write!(w, "YOU WON")?;
-                } else if !self.has_moves() {
-                    write!(w, "{}", cursor::Goto(total_width - 8, total_height))?;
-                    write!(w, "YOU LOST")?;
-                }
-
                 for (i, line) in self.grid.iter().enumerate() {
                     write!(w, "{}", cursor::Goto(left_pad, top_pad + i as u16))?;
                     for value in line {
-                        write!(w, "{:>6}", value)?;
+                        let color: Box<dyn Display> = match value {
+                            0 => Box::new(color::Fg(color::AnsiValue(247))),
+                            2 => Box::new(color::Fg(color::AnsiValue(202))),
+                            4 => Box::new(color::Fg(color::AnsiValue(214))),
+                            8 => Box::new(color::Fg(color::AnsiValue(226))),
+                            16 => Box::new(color::Fg(color::AnsiValue(40))),
+                            32 => Box::new(color::Fg(color::AnsiValue(47))),
+                            64 => Box::new(color::Fg(color::AnsiValue(14))),
+                            128 => Box::new(color::Fg(color::AnsiValue(33))),
+                            256 => Box::new(color::Fg(color::AnsiValue(141))),
+                            512 => Box::new(color::Fg(color::AnsiValue(213))),
+                            1024 => Box::new(color::Fg(color::AnsiValue(201))),
+                            _ => Box::new(color::Fg(color::AnsiValue(196))),
+                        };
+                        write!(
+                            w,
+                            "{bold}{color}{value:>6}{reset}",
+                            bold = style::Bold,
+                            color = color,
+                            value = value,
+                            reset = style::Reset,
+                        )?;
                     }
-                    writeln!(w, "")?;
                 }
+
+                let score = format!("Score: {}", self.score);
+                write!(w, "{}", cursor::Down(1))?;
+                write!(w, "{}", cursor::Left(score.len() as u16))?;
+                write!(w, "{}", score)?;
+
+                let mut msg = "";
+                if self.any(|x| x >= 2048) {
+                    msg = "YOU WON";
+                } else if !self.has_moves() {
+                    msg = "YOU LOST";
+                }
+                write!(w, "{}", cursor::Down(1))?;
+                if msg != "" {
+                    write!(w, "{}", cursor::Left(msg.len() as u16))?;
+                    write!(w, "{}{}{}", style::Bold, msg, style::Reset)?;
+                }
+
+                msg = "[q]uit";
+                write!(w, "{}", cursor::Down(2))?;
+                write!(w, "{}", cursor::Left(msg.len() as u16))?;
+                write!(w, "{}", msg)?;
+
+                write!(w, "{}", cursor::Hide)?;
 
                 w.flush()
             }
@@ -153,8 +182,8 @@ impl Game {
     }
 
     fn get_padding(&self, total_width: u16, total_height: u16) -> Option<(u16, u16)> {
-        let grid_width = (self.size * 6) + (self.size + 1);
-        let grid_height = self.size + 1;
+        let grid_width = self.size * 6;
+        let grid_height = self.size + 4;
 
         let horizontal = total_width as i16 - grid_width as i16;
         let vertical = total_height as i16 - grid_height as i16;
@@ -168,7 +197,7 @@ impl Game {
         }
     }
 
-    fn move_up(&mut self) {
+    fn move_up(&mut self, w: &mut dyn Write) -> io::Result<()> {
         let grid_size = self.size;
         self.move_cells(
             0..grid_size,
@@ -176,9 +205,10 @@ impl Game {
             |i, _| (0..i).rev(),
             |_, j, k| (k, j),
         );
+        self.write_to(w)
     }
 
-    fn move_down(&mut self) {
+    fn move_down(&mut self, w: &mut dyn Write) -> io::Result<()> {
         let grid_size = self.size;
         self.move_cells(
             (0..grid_size).rev(),
@@ -186,9 +216,10 @@ impl Game {
             |i, _| i + 1..grid_size,
             |_, j, k| (k, j),
         );
+        self.write_to(w)
     }
 
-    fn move_left(&mut self) {
+    fn move_left(&mut self, w: &mut dyn Write) -> io::Result<()> {
         let grid_size = self.size;
         self.move_cells(
             0..grid_size,
@@ -196,9 +227,10 @@ impl Game {
             |_, j| (0..j).rev(),
             |i, _, k| (i, k),
         );
+        self.write_to(w)
     }
 
-    fn move_right(&mut self) {
+    fn move_right(&mut self, w: &mut dyn Write) -> io::Result<()> {
         let grid_size = self.size;
         self.move_cells(
             0..grid_size,
@@ -206,6 +238,18 @@ impl Game {
             |_, j| j + 1..grid_size,
             |i, _, k| (i, k),
         );
+        self.write_to(w)
+    }
+
+    fn reset(&self, w: &mut dyn Write) -> io::Result<()> {
+        write!(
+            w,
+            "{}{}{}{}",
+            cursor::Restore,
+            style::Reset,
+            color::Bg(color::Reset),
+            color::Fg(color::Reset),
+        )
     }
 
     fn move_cells<T, U, V, W, X>(&mut self, i_range: T, j_range: U, k_range: W, next_cell: X)
