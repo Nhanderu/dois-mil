@@ -8,6 +8,7 @@ use std::env::args;
 use std::error::Error;
 use std::io::{self, stdin, stdout, Stdout, Write};
 use std::iter::Iterator;
+use std::process::exit;
 
 use game::Game;
 
@@ -16,7 +17,7 @@ use termion::cursor;
 use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::{IntoRawMode, RawTerminal};
-use termion::screen::{AlternateScreen,ToMainScreen};
+use termion::screen::{AlternateScreen, ToMainScreen};
 use termion::style;
 
 const DEFAULT_GRID_SIZE: usize = 4;
@@ -24,9 +25,9 @@ const DEFAULT_GRID_SIZE: usize = 4;
 macro_rules! catch {
     ($game:ident, $method:ident, $out:ident) => {
         if let Err(err) = $game.$method(&mut $out) {
-            exit(&mut $out).unwrap();
+            restore(&mut $out).unwrap();
             print!("Exited with error: {}.", err.description());
-            return;
+            exit(1);
         }
     };
 }
@@ -48,13 +49,15 @@ fn main() {
             Key::Right if game.has_moves() => catch!(game, move_right, screen),
             Key::Down if game.has_moves() => catch!(game, move_down, screen),
             Key::Left if game.has_moves() => catch!(game, move_left, screen),
-            Key::Char('q') | Key::Ctrl('q') | Key::Ctrl('c') => return exit(&mut screen).unwrap(),
+            Key::Char('q') | Key::Ctrl('q') | Key::Ctrl('c') => {
+                return restore(&mut screen).unwrap()
+            }
             _ => {}
         }
     }
 }
 
-fn exit(screen: &mut AlternateScreen<RawTerminal<Stdout>>) -> io::Result<()> {
+fn restore(screen: &mut AlternateScreen<RawTerminal<Stdout>>) -> io::Result<()> {
     write!(
         screen,
         "{}{}{}{}{}",
