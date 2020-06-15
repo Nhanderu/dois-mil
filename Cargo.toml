@@ -1,7 +1,7 @@
 [package]
 name = "dois-mil"
 description = "2048 game in the terminal!"
-version = "0.0.1"
+version = "1.0.0"
 authors = ["Rafael Escobar <rescobar@protonmail.com>"]
 keywords = [
     "2048",
