@@ -6,7 +6,7 @@ extern crate termion;
 
 use std::env::args;
 use std::error::Error;
-use std::io::{self, stdin, stdout, Stdout, Write};
+use std::io::{stdin, stdout, Stdout, Write};
 use std::iter::Iterator;
 use std::process::exit;
 
@@ -25,7 +25,7 @@ const DEFAULT_GRID_SIZE: usize = 4;
 macro_rules! catch {
     ($game:ident, $method:ident, $out:ident) => {
         if let Err(err) = $game.$method(&mut $out) {
-            restore(&mut $out).unwrap();
+            restore(&mut $out);
             print!("Exited with error: {}.", err.description());
             exit(1);
         }
@@ -33,14 +33,14 @@ macro_rules! catch {
 }
 
 fn main() {
-    let mut screen = AlternateScreen::from(stdout().into_raw_mode().unwrap());
-
     let grid_size = args().nth(1).map_or(DEFAULT_GRID_SIZE, |raw| {
         raw.parse::<usize>().unwrap_or(DEFAULT_GRID_SIZE)
     });
 
     let mut game = Game::new(grid_size);
     game.fill_random_cells();
+
+    let mut screen = AlternateScreen::from(stdout().into_raw_mode().unwrap());
     catch!(game, write_to, screen);
 
     for key in stdin().keys() {
@@ -49,15 +49,14 @@ fn main() {
             Key::Right if game.has_moves() => catch!(game, move_right, screen),
             Key::Down if game.has_moves() => catch!(game, move_down, screen),
             Key::Left if game.has_moves() => catch!(game, move_left, screen),
-            Key::Char('q') | Key::Ctrl('q') | Key::Ctrl('c') => {
-                return restore(&mut screen).unwrap()
-            }
+            Key::Char('q') | Key::Ctrl('q') | Key::Ctrl('c') => return restore(&mut screen),
             _ => {}
         }
     }
 }
 
-fn restore(screen: &mut AlternateScreen<RawTerminal<Stdout>>) -> io::Result<()> {
+fn restore(screen: &mut AlternateScreen<RawTerminal<Stdout>>) {
+    screen.suspend_raw_mode().unwrap();
     write!(
         screen,
         "{}{}{}{}{}",
@@ -67,4 +66,5 @@ fn restore(screen: &mut AlternateScreen<RawTerminal<Stdout>>) -> io::Result<()> 
         cursor::Show,
         ToMainScreen,
     )
+    .unwrap();
 }

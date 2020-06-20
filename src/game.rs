@@ -43,8 +43,8 @@ impl Game {
             0..grid_size,
             |i, _| (0..i).rev(),
             |_, j, k| (k, j),
-        );
-        self.write_to(w)
+            w,
+        )
     }
 
     pub fn move_down(&mut self, w: &mut dyn Write) -> Result<(), GameError> {
@@ -54,8 +54,8 @@ impl Game {
             0..grid_size,
             |i, _| i + 1..grid_size,
             |_, j, k| (k, j),
-        );
-        self.write_to(w)
+            w,
+        )
     }
 
     pub fn move_left(&mut self, w: &mut dyn Write) -> Result<(), GameError> {
@@ -65,8 +65,8 @@ impl Game {
             0..grid_size,
             |_, j| (0..j).rev(),
             |i, _, k| (i, k),
-        );
-        self.write_to(w)
+            w,
+        )
     }
 
     pub fn move_right(&mut self, w: &mut dyn Write) -> Result<(), GameError> {
@@ -76,11 +76,18 @@ impl Game {
             (0..grid_size).rev(),
             |_, j| j + 1..grid_size,
             |i, _, k| (i, k),
-        );
-        self.write_to(w)
+            w,
+        )
     }
 
-    fn move_cells<T, U, V, W, X>(&mut self, i_range: T, j_range: U, k_range: W, next_cell: X)
+    fn move_cells<T, U, V, W, X>(
+        &mut self,
+        i_range: T,
+        j_range: U,
+        k_range: W,
+        next_cell: X,
+        w: &mut dyn Write,
+    ) -> Result<(), GameError>
     where
         T: std::iter::Iterator<Item = usize>,
         U: std::iter::Iterator<Item = usize> + Clone,
@@ -129,6 +136,8 @@ impl Game {
         if moved {
             self.fill_random_cells();
         }
+
+        self.write_to(w)
     }
 
     pub fn write_to(&self, w: &mut dyn Write) -> Result<(), GameError> {
