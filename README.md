@@ -4,7 +4,26 @@
 
 ## Run
 
-For now, you'll need to use `cargo run` to execute it. You can also change the grid size, if you're feeling daring, with `cargo run <grid size>`.
+For now, you'll need to use `cargo run` to execute it.
+
+### Commands
+
+#### `dois-mil`
+
+Runs the game with default configuration.
+
+#### `dois-mil help`
+
+Shows the CLI help message.
+
+#### `dois-mil version`
+
+Shows the CLI version.
+
+#### `dois-mil <grid size>`
+
+Runs the game with a different grid size (e.g. `dois-mil 6` executes a 6x6 grid). The bigger the grid, the easier
+the game gets.
 
 ## To-do
 
