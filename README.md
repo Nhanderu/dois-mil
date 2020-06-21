@@ -4,7 +4,7 @@
 
 ## Run
 
-For now, you'll need to use `cargo run` to execute it. You can also change the grid size, if you're feeling daring with `cargo run <grid size>`.
+For now, you'll need to use `cargo run` to execute it. You can also change the grid size, if you're feeling daring, with `cargo run <grid size>`.
 
 ## To-do
 
