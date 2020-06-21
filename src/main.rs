@@ -32,9 +32,33 @@ macro_rules! catch {
 }
 
 fn main() {
-    let grid_size = args().nth(1).map_or(DEFAULT_GRID_SIZE, |raw| {
-        raw.parse::<usize>().unwrap_or(DEFAULT_GRID_SIZE)
-    });
+    let grid_size: usize;
+
+    let args: Vec<String> = args().collect();
+    match args.len() {
+        1 => grid_size = DEFAULT_GRID_SIZE,
+        2 => {
+            if &args[1] == "version"
+                || &args[1] == "--version"
+                || &args[1] == "v"
+                || &args[1] == "-v"
+            {
+                print!(env!("CARGO_PKG_VERSION"));
+                exit(1);
+            }
+            match args[1].parse() {
+                Ok(n) => grid_size = n,
+                Err(_) => {
+                    print!("Unknown arguments.");
+                    exit(1);
+                }
+            }
+        }
+        _ => {
+            print!("Unknown arguments.");
+            exit(1);
+        }
+    }
 
     let mut game = Game::new(grid_size);
     game.fill_random_cells();
