@@ -20,9 +20,7 @@ use termion::screen::{AlternateScreen, ToMainScreen};
 use termion::style;
 
 const DEFAULT_GRID_SIZE: usize = 4;
-const ARG_VERSION: [&str; 4] = ["version", "--version", "v", "-v"];
-const ARG_HELP: [&str; 4] = ["help", "--help", "h", "-h"];
-const MSG_HELP: &str = "\
+const HELP_MSG: &str = "\
 usage: dois-mil [<commands>] [<size>]
 
 Commands:
@@ -48,18 +46,14 @@ fn main() {
     let args: Vec<String> = args().collect();
     match args.len() {
         1 => run(DEFAULT_GRID_SIZE),
-        2 => {
-            if ARG_VERSION.contains(&args[1].as_ref()) {
-                print_and_exit(env!("CARGO_PKG_VERSION"), 0);
-            }
-            if ARG_HELP.contains(&args[1].as_ref()) {
-                print_and_exit(MSG_HELP, 0);
-            }
-            match args[1].parse() {
+        2 => match args[1].as_ref() {
+            "help" => print_and_exit(HELP_MSG, 0),
+            "version" => print_and_exit(env!("CARGO_PKG_VERSION"), 0),
+            arg => match arg.parse() {
                 Ok(grid_size) => run(grid_size),
                 Err(_) => print_and_exit("Invalid argument.", 1),
-            }
-        }
+            },
+        },
         _ => print_and_exit("Unknown arguments.", 1),
     }
 }
