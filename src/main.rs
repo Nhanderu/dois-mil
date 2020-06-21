@@ -21,6 +21,18 @@ use termion::style;
 
 const DEFAULT_GRID_SIZE: usize = 4;
 const ARG_VERSION: [&str; 4] = ["version", "--version", "v", "-v"];
+const ARG_HELP: [&str; 4] = ["help", "--help", "h", "-h"];
+const MSG_HELP: &str = "\
+usage: dois-mil [<commands>] [<size>]
+
+Commands:
+    help     Shows this message
+    version  Shows the game's version
+
+Args:
+    size  Defines the game's grid size (default to 4)
+
+";
 
 macro_rules! catch {
     ($game:ident, $method:ident, $out:expr) => {
@@ -39,6 +51,9 @@ fn main() {
         2 => {
             if ARG_VERSION.contains(&args[1].as_ref()) {
                 print_and_exit(env!("CARGO_PKG_VERSION"), 0);
+            }
+            if ARG_HELP.contains(&args[1].as_ref()) {
+                print_and_exit(MSG_HELP, 0);
             }
             match args[1].parse() {
                 Ok(grid_size) => run(grid_size),
