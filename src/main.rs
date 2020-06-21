@@ -5,7 +5,6 @@ extern crate rand;
 extern crate termion;
 
 use std::env::args;
-use std::error::Error;
 use std::io::{stdin, stdout, Stdout, Write};
 use std::iter::Iterator;
 use std::process::exit;
@@ -26,7 +25,7 @@ macro_rules! catch {
     ($game:ident, $method:ident, $out:ident) => {
         if let Err(err) = $game.$method(&mut $out) {
             restore(&mut $out);
-            print!("Exited with error: {}.", err.description());
+            print!("Exited with error: {}.", err);
             exit(1);
         }
     };

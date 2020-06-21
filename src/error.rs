@@ -12,13 +12,6 @@ impl GameError {
     pub fn new(err_type: GameErrorType) -> GameError {
         GameError { err_type: err_type }
     }
-
-    fn msg(&self) -> &str {
-        match &self.err_type {
-            GameErrorType::TerminalSize => "terminal size isn't fit for the game",
-            GameErrorType::Io(err) => err.description(),
-        }
-    }
 }
 
 impl From<io::Error> for GameError {
@@ -29,15 +22,15 @@ impl From<io::Error> for GameError {
 
 impl Display for GameError {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "{}", self.msg())
+        let msg: Box<dyn Display> = match &self.err_type {
+            GameErrorType::TerminalSize => Box::new("terminal size isn't fit for the game"),
+            GameErrorType::Io(err) => Box::new(err),
+        };
+        write!(f, "{}", msg)
     }
 }
 
 impl Error for GameError {
-    fn description(&self) -> &str {
-        self.msg()
-    }
-
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match &self.err_type {
             GameErrorType::TerminalSize => None,
