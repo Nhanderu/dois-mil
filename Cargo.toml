@@ -3,6 +3,7 @@ name = "dois-mil"
 description = "2048 game in the terminal!"
 version = "1.0.0"
 authors = ["Rafael Escobar <rescobar@protonmail.com>"]
+license-file = "LICENSE"
 keywords = [
     "2048",
     "tty",
