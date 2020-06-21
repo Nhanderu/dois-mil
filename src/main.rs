@@ -20,9 +20,10 @@ use termion::screen::{AlternateScreen, ToMainScreen};
 use termion::style;
 
 const DEFAULT_GRID_SIZE: usize = 4;
+const ARG_VERSION: [&str; 4] = ["version", "--version", "v", "-v"];
 
 macro_rules! catch {
-    ($game:ident, $method:ident, $out:ident) => {
+    ($game:ident, $method:ident, $out:expr) => {
         if let Err(err) = $game.$method(&mut $out) {
             restore(&mut $out);
             print!("Exited with error: {}.", err);
@@ -32,34 +33,23 @@ macro_rules! catch {
 }
 
 fn main() {
-    let grid_size: usize;
-
     let args: Vec<String> = args().collect();
     match args.len() {
-        1 => grid_size = DEFAULT_GRID_SIZE,
+        1 => run(DEFAULT_GRID_SIZE),
         2 => {
-            if &args[1] == "version"
-                || &args[1] == "--version"
-                || &args[1] == "v"
-                || &args[1] == "-v"
-            {
-                print!(env!("CARGO_PKG_VERSION"));
-                exit(1);
+            if ARG_VERSION.contains(&args[1].as_ref()) {
+                print_and_exit(env!("CARGO_PKG_VERSION"), 0);
             }
             match args[1].parse() {
-                Ok(n) => grid_size = n,
-                Err(_) => {
-                    print!("Unknown arguments.");
-                    exit(1);
-                }
+                Ok(grid_size) => run(grid_size),
+                Err(_) => print_and_exit("Invalid argument.", 1),
             }
         }
-        _ => {
-            print!("Unknown arguments.");
-            exit(1);
-        }
+        _ => print_and_exit("Unknown arguments.", 1),
     }
+}
 
+fn run(grid_size: usize) {
     let mut game = Game::new(grid_size);
     game.fill_random_cells();
 
@@ -90,4 +80,9 @@ fn restore(screen: &mut AlternateScreen<RawTerminal<Stdout>>) {
         ToMainScreen,
     )
     .unwrap();
+}
+
+fn print_and_exit(msg: &str, exit_code: i32) {
+    print!("{}", msg);
+    exit(exit_code);
 }
