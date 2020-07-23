@@ -2,6 +2,10 @@
 
 2048 game in the terminal!
 
+## Game
+
+[![asciicast][1]][2]
+
 ## Install
 
 ### Brew
@@ -47,6 +51,8 @@ The bigger the grid, the easier the game gets.
 
 ## License
 
-This project code is in the public domain. See the [LICENSE file][1].
+This project code is in the public domain. See the [LICENSE file][3].
 
-[1]: https://github.com/Nhanderu/dois-mil/blob/master/LICENSE
+[1]: https://asciinema.org/a/349256.svg
+[2]: https://asciinema.org/a/349256
+[3]: https://github.com/Nhanderu/dois-mil/blob/master/LICENSE
