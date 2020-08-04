@@ -47,14 +47,22 @@ fn main() {
     match args.len() {
         1 => run(DEFAULT_GRID_SIZE),
         2 => match args[1].as_ref() {
-            "help" => print_and_exit(HELP_MSG, 0),
-            "version" => print_and_exit(env!("CARGO_PKG_VERSION"), 0),
+            "help" => println!("{}", HELP_MSG),
+            "version" => println!("{}", env!("CARGO_PKG_VERSION")),
             arg => match arg.parse() {
                 Ok(grid_size) => run(grid_size),
-                Err(_) => print_and_exit("Invalid argument.", 1),
+                Err(_) => {
+                    eprintln!("Invalid argument.\n");
+                    println!("{}", HELP_MSG);
+                    exit(1);
+                }
             },
         },
-        _ => print_and_exit("Unknown arguments.", 1),
+        _ => {
+            eprintln!("Unknown arguments.\n");
+            println!("{}", HELP_MSG);
+            exit(1);
+        }
     }
 }
 
@@ -89,9 +97,4 @@ fn restore(screen: &mut AlternateScreen<RawTerminal<Stdout>>) {
         ToMainScreen,
     )
     .unwrap();
-}
-
-fn print_and_exit(msg: &str, exit_code: i32) {
-    print!("{}", msg);
-    exit(exit_code);
 }
