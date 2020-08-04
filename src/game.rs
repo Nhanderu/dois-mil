@@ -1,17 +1,10 @@
-use std::fmt::Display;
-use std::io::Write;
-use std::iter::Iterator;
-
-use error::GameError;
-
-use termion::clear;
-use termion::color;
-use termion::cursor;
-use termion::style;
-use termion::terminal_size;
-
-use rand::distributions::{Distribution, Uniform, WeightedIndex};
-use rand::random;
+use super::error_handling::{Error, Result};
+use rand::{
+    distributions::{Distribution, Uniform, WeightedIndex},
+    random,
+};
+use std::{fmt::Display, io::Write, iter::Iterator};
+use termion::{clear, color, cursor, style, terminal_size};
 
 const RANDOM_VALUES_WEIGHT: [(u32, usize); 2] = [(2, 2), (4, 1)];
 
@@ -36,7 +29,7 @@ impl Game {
         }
     }
 
-    pub fn move_up(&mut self, w: &mut dyn Write) -> Result<(), GameError> {
+    pub fn move_up(&mut self, w: &mut dyn Write) -> Result<()> {
         let grid_size = self.size;
         self.move_cells(
             0..grid_size,
@@ -47,7 +40,7 @@ impl Game {
         )
     }
 
-    pub fn move_down(&mut self, w: &mut dyn Write) -> Result<(), GameError> {
+    pub fn move_down(&mut self, w: &mut dyn Write) -> Result<()> {
         let grid_size = self.size;
         self.move_cells(
             (0..grid_size).rev(),
@@ -58,7 +51,7 @@ impl Game {
         )
     }
 
-    pub fn move_left(&mut self, w: &mut dyn Write) -> Result<(), GameError> {
+    pub fn move_left(&mut self, w: &mut dyn Write) -> Result<()> {
         let grid_size = self.size;
         self.move_cells(
             0..grid_size,
@@ -69,7 +62,7 @@ impl Game {
         )
     }
 
-    pub fn move_right(&mut self, w: &mut dyn Write) -> Result<(), GameError> {
+    pub fn move_right(&mut self, w: &mut dyn Write) -> Result<()> {
         let grid_size = self.size;
         self.move_cells(
             0..grid_size,
@@ -87,7 +80,7 @@ impl Game {
         k_range: W,
         next_cell: X,
         w: &mut dyn Write,
-    ) -> Result<(), GameError>
+    ) -> Result<()>
     where
         T: std::iter::Iterator<Item = usize>,
         U: std::iter::Iterator<Item = usize> + Clone,
@@ -140,12 +133,12 @@ impl Game {
         self.write_to(w)
     }
 
-    pub fn write_to(&self, w: &mut dyn Write) -> Result<(), GameError> {
+    pub fn write_to(&self, w: &mut dyn Write) -> Result<()> {
         write!(w, "{}", clear::All)?;
 
         let (total_width, total_height) = terminal_size()?;
         match self.get_padding(total_width, total_height) {
-            None => Err(GameError::TerminalSize),
+            None => Err(Error::TerminalSize),
             Some((left_pad, top_pad)) => {
                 for (i, line) in self.grid.iter().enumerate() {
                     write!(w, "{}", cursor::Goto(left_pad, top_pad + i as u16))?;

@@ -8,6 +8,7 @@ license = "Unlicense"
 readme = "README.md"
 categories = ["games"]
 keywords = ["2048", "tty", "game"]
+edition = "2018"
 
 [dependencies]
 termion = "1.5.5"

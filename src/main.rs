@@ -1,23 +1,21 @@
-mod error;
+mod error_handling;
 mod game;
 
-extern crate rand;
-extern crate termion;
-
-use std::env::args;
-use std::io::{stdin, stdout, Stdout, Write};
-use std::iter::Iterator;
-use std::process::exit;
-
 use game::Game;
-
-use termion::color;
-use termion::cursor;
-use termion::event::Key;
-use termion::input::TermRead;
-use termion::raw::{IntoRawMode, RawTerminal};
-use termion::screen::{AlternateScreen, ToMainScreen};
-use termion::style;
+use std::{
+    env::args,
+    io::{stdin, stdout, Stdout, Write},
+    iter::Iterator,
+    process::exit,
+};
+use termion::{
+    color, cursor,
+    event::Key,
+    input::TermRead,
+    raw::{IntoRawMode, RawTerminal},
+    screen::{AlternateScreen, ToMainScreen},
+    style,
+};
 
 const DEFAULT_GRID_SIZE: usize = 4;
 const HELP_MSG: &str = "\
