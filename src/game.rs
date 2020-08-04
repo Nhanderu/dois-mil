@@ -2,7 +2,7 @@ use std::fmt::Display;
 use std::io::Write;
 use std::iter::Iterator;
 
-use error::{GameError, GameErrorType};
+use error::GameError;
 
 use termion::clear;
 use termion::color;
@@ -145,7 +145,7 @@ impl Game {
 
         let (total_width, total_height) = terminal_size()?;
         match self.get_padding(total_width, total_height) {
-            None => Err(GameError::new(GameErrorType::TerminalSize)),
+            None => Err(GameError::TerminalSize),
             Some((left_pad, top_pad)) => {
                 for (i, line) in self.grid.iter().enumerate() {
                     write!(w, "{}", cursor::Goto(left_pad, top_pad + i as u16))?;
