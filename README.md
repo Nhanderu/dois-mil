@@ -44,8 +44,8 @@ Shows the CLI version.
 
 #### `dois-mil <grid size>`
 
-Runs the game with a different grid size (e.g. `dois-mil 6` executes a 6x6
-grid).
+Runs the game with a different grid size (e.g. `dois-mil 6` executes a
+6x6 grid).
 
 The bigger the grid, the easier the game gets.
 
@@ -59,9 +59,9 @@ This project code is in the public domain. See the [LICENSE file][2].
 
 ### Contribution
 
-Unless you explicitly state otherwise, any contribution intentionally submitted
-for inclusion in the work by you shall be in the public domain, without any
-additional terms or conditions.
+Unless you explicitly state otherwise, any contribution intentionally
+submitted for inclusion in the work by you shall be in the public
+domain, without any additional terms or conditions.
 
 [1]: https://asciinema.org/a/349256
 [2]: ./LICENSE
